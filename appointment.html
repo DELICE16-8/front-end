@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CareConnect – Book Appointment</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --mint:#00C896;--mint-light:#E6FBF5;--mint-dark:#008F6B;
+    --navy:#0A2540;--navy-mid:#1A3A5C;--violet:#6366F1;--lavender:#EEF0FF;
+    --text:#0A2540;--text-2:#4A6080;--text-3:#8CA0B5;
+    --bg:#F7FBFF;--card:#FFFFFF;--sand:#F5EFE6;
+    --r:16px;--r-sm:10px;--r-full:999px;
+    --shadow:0 2px 16px rgba(10,37,64,0.08);
+  }
+  body{font-family:'DM Sans',sans-serif;background:#E8EEF5;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+  .phone{width:390px;min-height:844px;background:var(--bg);border-radius:48px;overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:0 40px 80px rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.8);}
+  .status-bar{display:flex;justify-content:space-between;padding:14px 24px 0;font-size:12px;font-weight:600;color:var(--text-3);}
+  .header{display:flex;align-items:center;gap:12px;padding:10px 20px 14px;}
+  .back-btn{width:38px;height:38px;border-radius:50%;background:var(--card);border:1px solid rgba(10,37,64,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;box-shadow:var(--shadow);flex-shrink:0;text-decoration:none;color:var(--text);}
+  .header-title{font-family:'Fraunces',serif;font-size:17px;font-weight:500;color:var(--text);}
+  .avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--mint),var(--violet));display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600;margin-left:auto;flex-shrink:0;}
+  .progress-wrap{padding:0 20px 16px;}
+  .progress-track{height:4px;background:rgba(10,37,64,0.08);border-radius:2px;overflow:hidden;}
+  .progress-fill{height:100%;width:55%;background:linear-gradient(90deg,var(--mint),var(--violet));border-radius:2px;}
+  .scroll{overflow-y:auto;padding:0 20px 120px;flex:1;}
+  .scroll::-webkit-scrollbar{display:none;}
+  .section-label{font-size:10px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px;}
+  /* Doctor mini card */
+  .doc-mini{display:flex;gap:12px;align-items:center;padding:14px;background:var(--card);border-radius:var(--r);border:1px solid rgba(10,37,64,0.08);box-shadow:var(--shadow);margin-bottom:20px;}
+  .doc-mini-avatar{width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#E3F8F2,#D4E6FF);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+  .doc-mini-name{font-weight:600;font-size:14px;color:var(--text);}
+  .doc-mini-spec{font-size:12px;color:var(--text-2);margin-top:2px;}
+  .doc-mini-rating{font-size:11px;color:var(--mint-dark);margin-top:4px;font-weight:500;}
+  /* Date strip */
+  .date-strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:20px;}
+  .date-strip::-webkit-scrollbar{display:none;}
+  .date-pill{flex-shrink:0;width:56px;text-align:center;padding:10px 6px;border-radius:14px;border:1.5px solid rgba(10,37,64,0.1);cursor:pointer;transition:all 0.2s;background:var(--card);}
+  .date-pill .day{font-size:10px;color:var(--text-3);font-weight:500;margin-bottom:2px;}
+  .date-pill .num{font-size:18px;font-weight:700;color:var(--text);}
+  .date-pill.active{background:var(--navy);border-color:var(--navy);}
+  .date-pill.active .day,.date-pill.active .num{color:#fff;}
+  .date-pill.off{opacity:0.35;cursor:not-allowed;}
+  /* Time slots */
+  .slot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
+  .slot{padding:12px;text-align:center;border-radius:var(--r-sm);border:1.5px solid rgba(10,37,64,0.1);cursor:pointer;font-size:13px;font-weight:500;color:var(--text-2);transition:all 0.2s;background:var(--card);}
+  .slot:hover{border-color:var(--mint);color:var(--mint-dark);}
+  .slot.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .slot.booked{opacity:0.35;cursor:not-allowed;background:var(--bg);}
+  .slot.active-alt{background:var(--mint-light);border-color:var(--mint);color:var(--mint-dark);}
+  /* Visit type */
+  .visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+  .visit-opt{padding:14px 10px;border-radius:var(--r);border:1.5px solid rgba(10,37,64,0.1);text-align:center;cursor:pointer;transition:all 0.2s;background:var(--card);}
+  .visit-opt .vicon{font-size:22px;display:block;margin-bottom:6px;}
+  .visit-opt .vlabel{font-size:13px;font-weight:500;color:var(--text-2);}
+  .visit-opt .vsub{font-size:11px;color:var(--text-3);margin-top:2px;}
+  .visit-opt.active{background:var(--navy);border-color:var(--navy);}
+  .visit-opt.active .vlabel{color:#fff;}
+  .visit-opt.active .vsub{color:rgba(255,255,255,0.6);}
+  /* Notes */
+  .notes-input{width:100%;padding:12px 14px;border-radius:var(--r-sm);border:1.5px solid rgba(10,37,64,0.12);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--card);outline:none;resize:none;min-height:80px;transition:border-color 0.2s;}
+  .notes-input:focus{border-color:var(--mint);}
+  /* Summary strip */
+  .summary-strip{background:var(--sand);border-radius:var(--r);padding:14px;margin-bottom:20px;border:none;}
+  .summary-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:13px;}
+  .summary-lbl{color:var(--text-2);}
+  .summary-val{font-weight:600;color:var(--text);}
+  /* Bottom */
+  .bottom-action{position:absolute;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid rgba(10,37,64,0.06);padding:16px 20px 36px;box-shadow:0 -8px 32px rgba(10,37,64,0.08);}
+  .btn{display:block;width:100%;padding:16px;border-radius:var(--r-full);border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:center;text-decoration:none;}
+  .btn-primary{background:var(--navy);color:#fff;}
+  .btn-primary:hover{background:var(--navy-mid);transform:translateY(-1px);box-shadow:0 6px 20px rgba(10,37,64,0.2);}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .s1{animation:fadeUp 0.4s 0.05s both}.s2{animation:fadeUp 0.4s 0.1s both}.s3{animation:fadeUp 0.4s 0.15s both}.s4{animation:fadeUp 0.4s 0.2s both}.s5{animation:fadeUp 0.4s 0.25s both}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="status-bar"><span>9:45</span><span>●●● 5G ▮▮▮</span></div>
+  <div class="header">
+    <a href="doctor-discovery.html" class="back-btn">←</a>
+    <span class="header-title">Pick a time</span>
+    <div class="avatar">AK</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill"></div></div>
+  </div>
+
+  <div class="scroll">
+    <!-- Doctor mini -->
+    <div class="doc-mini s1">
+      <div class="doc-mini-avatar">👨‍⚕️</div>
+      <div>
+        <div class="doc-mini-name">Dr. Emmanuel Nkurunziza</div>
+        <div class="doc-mini-spec">General Practitioner · CHUK Hospital</div>
+        <div class="doc-mini-rating">★ 4.9 · 247 reviews · NHIS covered</div>
+      </div>
+    </div>
+
+    <!-- Date -->
+    <div class="section-label s2">Select a date</div>
+    <div class="date-strip s2">
+      <div class="date-pill" onclick="selectDate(this)"><div class="day">Mon</div><div class="num">28</div></div>
+      <div class="date-pill active" onclick="selectDate(this)"><div class="day">Tue</div><div class="num">29</div></div>
+      <div class="date-pill" onclick="selectDate(this)"><div class="day">Wed</div><div class="num">30</div></div>
+      <div class="date-pill" onclick="selectDate(this)"><div class="day">Thu</div><div class="num">1</div></div>
+      <div class="date-pill" onclick="selectDate(this)"><div class="day">Fri</div><div class="num">2</div></div>
+      <div class="date-pill off"><div class="day">Sat</div><div class="num">3</div></div>
+      <div class="date-pill off"><div class="day">Sun</div><div class="num">4</div></div>
+    </div>
+
+    <!-- Morning slots -->
+    <div class="section-label s3">🌅 Morning</div>
+    <div class="slot-grid s3">
+      <div class="slot booked">8:00 AM</div>
+      <div class="slot active" onclick="selectSlot(this,'9:30 AM')">9:30 AM</div>
+      <div class="slot" onclick="selectSlot(this,'10:00 AM')">10:00 AM</div>
+    </div>
+
+    <!-- Afternoon slots -->
+    <div class="section-label s4">☀️ Afternoon</div>
+    <div class="slot-grid s4">
+      <div class="slot" onclick="selectSlot(this,'1:00 PM')">1:00 PM</div>
+      <div class="slot" onclick="selectSlot(this,'2:30 PM')">2:30 PM</div>
+      <div class="slot" onclick="selectSlot(this,'4:00 PM')">4:00 PM</div>
+    </div>
+
+    <!-- Visit type -->
+    <div class="section-label s4">Visit type</div>
+    <div class="visit-grid s4">
+      <div class="visit-opt active" onclick="selectVisit(this)">
+        <span class="vicon">🏥</span>
+        <div class="vlabel">In-person</div>
+        <div class="vsub">CHUK Hospital</div>
+      </div>
+      <div class="visit-opt" onclick="selectVisit(this)">
+        <span class="vicon">📱</span>
+        <div class="vlabel">Video call</div>
+        <div class="vsub">From home</div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="section-label s5">Additional notes (optional)</div>
+    <textarea class="notes-input s5" placeholder="Any specific concerns or information for the doctor..."></textarea>
+
+    <!-- Summary -->
+    <div class="summary-strip s5" style="margin-top:16px">
+      <div class="summary-row"><span class="summary-lbl">Doctor</span><span class="summary-val">Dr. E. Nkurunziza</span></div>
+      <div class="summary-row"><span class="summary-lbl">Date</span><span class="summary-val" id="sum-date">Tue, Apr 29</span></div>
+      <div class="summary-row"><span class="summary-lbl">Time</span><span class="summary-val" id="sum-time">9:30 AM</span></div>
+      <div class="summary-row"><span class="summary-lbl">Type</span><span class="summary-val" id="sum-type">In-person</span></div>
+      <div class="summary-row"><span class="summary-lbl">Cost</span><span class="summary-val" style="color:var(--mint-dark)">Free (NHIS)</span></div>
+    </div>
+  </div>
+
+  <div class="bottom-action">
+    <a href="confirmation.html" class="btn btn-primary">Confirm booking →</a>
+  </div>
+</div>
+
+<script>
+  const days = ['Mon','Tue','Wed','Thu','Fri'];
+  const dates = [28,29,30,1,2];
+
+  function selectDate(el) {
+    document.querySelectorAll('.date-pill:not(.off)').forEach(d => d.classList.remove('active'));
+    el.classList.add('active');
+    const num = el.querySelector('.num').textContent;
+    const day = el.querySelector('.day').textContent;
+    document.getElementById('sum-date').textContent = day + ', Apr ' + num;
+  }
+
+  function selectSlot(el, time) {
+    document.querySelectorAll('.slot:not(.booked)').forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('sum-time').textContent = time;
+  }
+
+  function selectVisit(el) {
+    document.querySelectorAll('.visit-opt').forEach(v => v.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('sum-type').textContent = el.querySelector('.vlabel').textContent;
+  }
+</script>
+</body>
+</html>

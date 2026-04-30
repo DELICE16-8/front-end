@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CareConnect – Symptoms</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --mint:#00C896; --mint-light:#E6FBF5; --mint-dark:#008F6B;
+    --navy:#0A2540; --navy-mid:#1A3A5C;
+    --violet:#6366F1;
+    --text:#0A2540; --text-2:#4A6080; --text-3:#8CA0B5;
+    --bg:#F7FBFF; --card:#FFFFFF;
+    --sand:#F5EFE6; --warm:#FFF8F0;
+    --r:16px; --r-sm:10px; --r-full:999px;
+    --shadow:0 2px 16px rgba(10,37,64,0.08);
+  }
+  body { font-family:'DM Sans',sans-serif; background:#E8EEF5; min-height:100vh; display:flex; align-items:center; justify-content:center; }
+  .phone {
+    width:390px; min-height:844px; background:var(--bg);
+    border-radius:48px; overflow:hidden; position:relative;
+    display:flex; flex-direction:column;
+    box-shadow:0 40px 80px rgba(0,0,0,0.3);
+    border:1px solid rgba(255,255,255,0.8);
+  }
+  /* Status */
+  .status-bar { display:flex; justify-content:space-between; padding:14px 24px 0; font-size:12px; font-weight:600; color:var(--text-3); }
+  /* Header */
+  .header { display:flex; align-items:center; gap:12px; padding:10px 20px 14px; }
+  .back-btn {
+    width:38px; height:38px; border-radius:50%; background:var(--card);
+    border:1px solid rgba(10,37,64,0.1); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:18px; box-shadow:var(--shadow); flex-shrink:0; text-decoration:none; color:var(--text);
+  }
+  .header-title { font-family:'Fraunces',serif; font-size:17px; font-weight:500; color:var(--text); }
+  .avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--mint),var(--violet)); display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; font-weight:600; margin-left:auto; flex-shrink:0; }
+  /* Progress */
+  .progress-wrap { padding:0 20px 16px; }
+  .progress-track { height:4px; background:rgba(10,37,64,0.08); border-radius:2px; overflow:hidden; }
+  .progress-fill { height:100%; width:12%; background:linear-gradient(90deg,var(--mint),var(--violet)); border-radius:2px; transition:width 0.5s ease; }
+  .progress-labels { display:flex; justify-content:space-between; margin-top:6px; }
+  .progress-label { font-size:10px; color:var(--text-3); font-weight:500; }
+  /* Scroll area */
+  .scroll { overflow-y:auto; padding:0 20px 120px; flex:1; }
+  .scroll::-webkit-scrollbar { display:none; }
+  /* Typography */
+  .h2 { font-family:'Fraunces',serif; font-size:24px; font-weight:300; line-height:1.25; color:var(--text); }
+  .body-text { font-size:14px; color:var(--text-2); line-height:1.6; }
+  .section-label { font-size:10px; font-weight:700; letter-spacing:0.09em; text-transform:uppercase; color:var(--text-3); margin-bottom:10px; }
+  /* Search input */
+  .search-wrap { position:relative; margin-bottom:20px; }
+  .search-wrap input {
+    width:100%; padding:14px 16px 14px 46px;
+    border-radius:var(--r-sm); border:1.5px solid rgba(10,37,64,0.12);
+    font-family:'DM Sans',sans-serif; font-size:15px; color:var(--text); background:var(--card);
+    outline:none; transition:border-color 0.2s; box-shadow:var(--shadow);
+  }
+  .search-wrap input:focus { border-color:var(--mint); }
+  .search-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:18px; }
+  /* Chips */
+  .chip-grid { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:22px; }
+  .tag {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:8px 14px; border-radius:var(--r-full); font-size:13px; font-weight:500;
+    cursor:pointer; transition:all 0.2s; border:1.5px solid rgba(10,37,64,0.12);
+    background:var(--card); color:var(--text-2); user-select:none;
+  }
+  .tag:hover { border-color:var(--navy); color:var(--navy); }
+  .tag.active { background:var(--navy); color:#fff; border-color:var(--navy); }
+  .tag.urgent.active { background:#D32F2F; border-color:#D32F2F; }
+  /* Severity */
+  .severity-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-bottom:22px; }
+  .sev-btn {
+    padding:12px 4px; text-align:center; border-radius:12px;
+    border:1.5px solid rgba(10,37,64,0.1); cursor:pointer; transition:all 0.2s;
+    font-size:10px; color:var(--text-2);
+  }
+  .sev-btn .em { font-size:22px; display:block; margin-bottom:4px; }
+  .sev-btn:hover { border-color:var(--navy); }
+  .sev-btn.active { background:var(--navy); color:#fff; border-color:var(--navy); }
+  /* Duration */
+  .duration-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:22px; }
+  .dur-btn {
+    padding:10px 6px; text-align:center; border-radius:10px;
+    border:1.5px solid rgba(10,37,64,0.1); cursor:pointer; transition:all 0.2s;
+    font-size:12px; color:var(--text-2); font-weight:500;
+  }
+  .dur-btn.active { background:var(--navy); color:#fff; border-color:var(--navy); }
+  /* AI suggestion card */
+  .ai-card {
+    padding:14px; border-radius:var(--r); border:1.5px solid rgba(0,200,150,0.2);
+    background:var(--mint-light); display:flex; gap:12px; align-items:flex-start;
+    transition:all 0.3s;
+  }
+  .ai-card.urgent { background:#FFF3E0; border-color:rgba(211,47,47,0.2); }
+  .ai-card p { font-size:13px; line-height:1.5; }
+  .ai-title { font-weight:600; color:var(--mint-dark); margin-bottom:3px; font-size:12px; }
+  .ai-card.urgent .ai-title { color:#D32F2F; }
+  /* Bottom action */
+  .bottom-action {
+    position:absolute; bottom:0; left:0; right:0;
+    background:var(--card); border-top:1px solid rgba(10,37,64,0.06);
+    padding:16px 20px 36px; box-shadow:0 -8px 32px rgba(10,37,64,0.08);
+  }
+  .btn {
+    display:block; width:100%; padding:16px; border-radius:var(--r-full);
+    border:none; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:600;
+    cursor:pointer; transition:all 0.2s; text-align:center; text-decoration:none;
+  }
+  .btn-primary { background:var(--navy); color:#fff; }
+  .btn-primary:hover { background:var(--navy-mid); transform:translateY(-1px); box-shadow:0 6px 20px rgba(10,37,64,0.2); }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)} }
+  .s1{animation:fadeUp 0.4s 0.05s both} .s2{animation:fadeUp 0.4s 0.1s both}
+  .s3{animation:fadeUp 0.4s 0.15s both} .s4{animation:fadeUp 0.4s 0.2s both}
+  .s5{animation:fadeUp 0.4s 0.25s both}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="status-bar"><span>9:41</span><span>●●● 5G ▮▮▮</span></div>
+  <div class="header">
+    <a href="index.html" class="back-btn">←</a>
+    <span class="header-title">How are you feeling?</span>
+    <div class="avatar">AK</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill"></div></div>
+    <div class="progress-labels">
+      <span class="progress-label">Symptoms</span>
+      <span class="progress-label">Doctor</span>
+      <span class="progress-label">Book</span>
+      <span class="progress-label">Visit</span>
+      <span class="progress-label">Recovery</span>
+    </div>
+  </div>
+
+  <div class="scroll">
+    <p class="h2 s1" style="margin-bottom:6px">Tell us what's bothering you</p>
+    <p class="body-text s2" style="margin-bottom:20px">Choose all that apply — we'll match you to the right doctor.</p>
+
+    <div class="search-wrap s2">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" placeholder="Describe how you feel..." oninput="filterSymptoms(this.value)">
+    </div>
+
+    <div class="section-label s3">Common symptoms — tap all that apply</div>
+    <div class="chip-grid s3" id="chip-container">
+      <span class="tag" onclick="toggleTag(this,'Headache')">🤕 Headache</span>
+      <span class="tag" onclick="toggleTag(this,'Fever')">🌡️ Fever</span>
+      <span class="tag" onclick="toggleTag(this,'Cough')">😮‍💨 Cough</span>
+      <span class="tag" onclick="toggleTag(this,'Fatigue')">😴 Fatigue</span>
+      <span class="tag" onclick="toggleTag(this,'Nausea')">🤢 Nausea</span>
+      <span class="tag" onclick="toggleTag(this,'Body aches')">💪 Body aches</span>
+      <span class="tag" onclick="toggleTag(this,'Sore throat')">😣 Sore throat</span>
+      <span class="tag" onclick="toggleTag(this,'Dizziness')">😵 Dizziness</span>
+      <span class="tag urgent" onclick="toggleTag(this,'Chest pain')">❤️ Chest pain</span>
+      <span class="tag urgent" onclick="toggleTag(this,'Shortness of breath')">💨 Shortness of breath</span>
+      <span class="tag" onclick="toggleTag(this,'Runny nose')">👃 Runny nose</span>
+      <span class="tag" onclick="toggleTag(this,'Stomach pain')">🫃 Stomach pain</span>
+    </div>
+
+    <div class="section-label s4">How severe is it?</div>
+    <div class="severity-grid s4">
+      <div class="sev-btn" onclick="setSeverity(1,this)"><span class="em">😊</span>Mild</div>
+      <div class="sev-btn" onclick="setSeverity(2,this)"><span class="em">🙂</span>Low</div>
+      <div class="sev-btn" onclick="setSeverity(3,this)"><span class="em">😐</span>Moderate</div>
+      <div class="sev-btn" onclick="setSeverity(4,this)"><span class="em">😟</span>High</div>
+      <div class="sev-btn" onclick="setSeverity(5,this)"><span class="em">😰</span>Severe</div>
+    </div>
+
+    <div class="section-label s4">How long have you had these symptoms?</div>
+    <div class="duration-grid s4">
+      <div class="dur-btn active" onclick="setDuration(this)">Today</div>
+      <div class="dur-btn" onclick="setDuration(this)">2–3 days</div>
+      <div class="dur-btn" onclick="setDuration(this)">A week</div>
+      <div class="dur-btn" onclick="setDuration(this)">2+ weeks</div>
+      <div class="dur-btn" onclick="setDuration(this)">1+ month</div>
+      <div class="dur-btn" onclick="setDuration(this)">Chronic</div>
+    </div>
+
+    <div class="ai-card s5" id="ai-card">
+      <span style="font-size:22px;flex-shrink:0">💡</span>
+      <div>
+        <p class="ai-title" id="ai-title">AI Suggestion</p>
+        <p id="ai-text" style="font-size:13px;color:#4A6080;line-height:1.5">Select your symptoms above and we'll suggest the right specialist for you.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-action">
+    <a href="doctor.html" class="btn btn-primary">Find matching doctors →</a>
+  </div>
+</div>
+
+<script>
+  let selected = [];
+
+  function toggleTag(el, name) {
+    el.classList.toggle('active');
+    if (el.classList.contains('active')) selected.push(name);
+    else selected = selected.filter(s => s !== name);
+    updateAI();
+  }
+
+  function setSeverity(n, el) {
+    document.querySelectorAll('.sev-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function setDuration(el) {
+    document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function filterSymptoms(query) {
+    document.querySelectorAll('.tag').forEach(tag => {
+      tag.style.display = tag.textContent.toLowerCase().includes(query.toLowerCase()) ? '' : 'none';
+    });
+  }
+
+  function updateAI() {
+    const card = document.getElementById('ai-card');
+    const title = document.getElementById('ai-title');
+    const text = document.getElementById('ai-text');
+    const urgent = selected.includes('Chest pain') || selected.includes('Shortness of breath');
+    const respiratory = selected.includes('Cough') || selected.includes('Sore throat') || selected.includes('Fever');
+
+    if (urgent) {
+      card.classList.add('urgent');
+      title.style.color = '#D32F2F';
+      title.textContent = '⚠️ Urgent attention needed';
+      text.textContent = 'These symptoms may indicate a serious condition. Please go to the emergency room or book an urgent appointment immediately.';
+    } else if (respiratory) {
+      card.classList.remove('urgent');
+      title.style.color = '#008F6B';
+      title.textContent = '💡 AI Suggestion';
+      text.textContent = 'Based on your symptoms, a General Practitioner or Respiratory Specialist is recommended. Dr. Emmanuel Nkurunziza is available today.';
+    } else if (selected.length > 0) {
+      card.classList.remove('urgent');
+      title.style.color = '#008F6B';
+      title.textContent = '💡 AI Suggestion';
+      text.textContent = 'A General Practitioner is the best starting point. They can refer you to a specialist if needed.';
+    } else {
+      card.classList.remove('urgent');
+      title.style.color = '#008F6B';
+      title.textContent = 'AI Suggestion';
+      text.textContent = 'Select your symptoms above and we\'ll suggest the right specialist for you.';
+    }
+  }
+</script>
+</body>
+</html>
